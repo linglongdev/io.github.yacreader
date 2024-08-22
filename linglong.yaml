@@ -1,0 +1,36 @@
+version: "1"
+
+package:
+  id: io.github.yacreader
+  name: yacreader
+  version: 9.1.2.1
+  kind: app
+  description: |
+    Yet another comic reader
+
+command:
+  - /opt/apps/io.github.yacreader/files/bin/YACReader
+
+base: org.deepin.foundation/23.0.0
+runtime: org.deepin.Runtime/23.0.1
+
+sources:
+  - kind: git
+    url: https://github.com/YACReader/yacreader.git
+    version: master
+    commit: c5924e625bde7bd5579c3b361655afffa0a371d1
+  - kind: git
+    url: https://github.com/selmf/unarr.git
+    version: master
+    commit: b211040df83dee513362cdeb9bd87afa26fd5e38
+build: |
+  cd /project/linglong/sources/unarr.git
+  mkdir build
+  cd build
+  cmake .. \
+        -DCMAKE_INSTALL_PREFIX=${PREFIX}
+  cmake --build . --target install -j$(nproc --all)
+  cd /project/linglong/sources/yacreader.git
+  qmake -makefile PREFIX=${PREFIX} LIB_INSTALL_DIR=${PREFIX}/lib/${TRIPLET} CONFIG+=no_pdf 
+  make -j$(nproc)
+  make install
